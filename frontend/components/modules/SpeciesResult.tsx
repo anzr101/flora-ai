@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { AlertTriangle, Check, ScanEye } from "lucide-react";
 import { Meter } from "@/components/ui/Meter";
 import type { SpeciesPrediction } from "@/lib/types";
-import { humanize, pct } from "@/lib/utils";
+import { pct } from "@/lib/utils";
 
 /** Animated circular confidence indicator. */
 function ConfidenceRing({ value, warn }: { value: number; warn: boolean }) {
@@ -45,8 +45,8 @@ export function SpeciesResult({ data }: { data: SpeciesPrediction }) {
             <span className="eyebrow">
               <ScanEye className="h-3.5 w-3.5" /> Identified
             </span>
-            <div className="mt-1 font-display text-[1.9rem] leading-tight text-forest">
-              {humanize(data.label)}
+            <div className="mt-1 font-display text-[1.7rem] italic leading-tight text-forest">
+              {data.label}
             </div>
           </div>
         </div>
@@ -81,7 +81,7 @@ export function SpeciesResult({ data }: { data: SpeciesPrediction }) {
             return (
               <Meter
                 key={i}
-                label={humanize(name)}
+                label={name}
                 value={conf}
                 tone={i === 0 ? "leaf" : "muted"}
               />

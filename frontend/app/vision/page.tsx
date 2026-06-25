@@ -12,14 +12,6 @@ import { SpeciesResult } from "@/components/modules/SpeciesResult";
 import { identifySpecies } from "@/lib/api";
 import type { SpeciesPrediction } from "@/lib/types";
 
-// Houseplants the zero-shot identifier recognises (open-vocabulary — extendable).
-const SUPPORTED_SPECIES = [
-  "Monstera deliciosa", "Snake plant", "Golden pothos", "Peace lily",
-  "Fiddle-leaf fig", "Rubber plant", "ZZ plant", "Spider plant",
-  "Aloe vera", "Jade plant", "Boston fern", "Calathea",
-  "Philodendron", "English ivy", "Chinese evergreen", "Orchid",
-];
-
 export default function VisionPage() {
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<SpeciesPrediction | null>(null);
@@ -68,27 +60,13 @@ export default function VisionPage() {
               <Info className="h-3.5 w-3.5" /> How identification works
             </p>
             <p className="mt-2 text-[0.82rem] leading-relaxed text-ink/75">
-              This uses <strong>CLIP zero-shot</strong> recognition — your photo is
-              matched against text descriptions of each plant, so it works on
-              <strong> real photos with no training data</strong>. It's
-              open-vocabulary: new species are added with a sentence, not a
-              retraining run. Currently recognises {SUPPORTED_SPECIES.length} common
-              houseplants.
+              Powered by <strong>BioCLIP</strong>, a vision model trained on 10M
+              images across the biological tree of life. It identifies plants
+              against <strong>~450,000 species</strong> — not a fixed list — so it
+              works on real photos of houseplants, trees, flowers, herbs and wild
+              plants alike, returning the scientific and common name with a
+              calibrated confidence.
             </p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {SUPPORTED_SPECIES.slice(0, 8).map((c) => (
-                <span
-                  key={c}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-[0.74rem] text-ink/70"
-                >
-                  <span className="h-1.5 w-1.5 rounded-full bg-leaf" />
-                  {c}
-                </span>
-              ))}
-              <span className="inline-flex items-center rounded-full border border-line bg-surface px-2.5 py-1 text-[0.74rem] text-muted">
-                +{SUPPORTED_SPECIES.length - 8} more
-              </span>
-            </div>
           </div>
         </Card>
 

@@ -34,12 +34,18 @@ class DLSettings(BaseSettings):
     num_workers: int = 0  # 0 is safest cross-platform (Windows spawn issues)
 
     # Which identifier the API serves:
-    #   "clip" → CLIP zero-shot, open-vocabulary, works on REAL photos (default)
-    #   "cnn"  → the supervised transfer-learning model (needs a trained checkpoint)
-    identifier_backend: str = "clip"
+    #   "bioclip" → BioCLIP tree-of-life, identifies ANY of ~450K taxa (default)
+    #   "clip"    → CLIP zero-shot over a fixed 16-houseplant catalog
+    #   "cnn"     → the supervised transfer-learning model (needs a checkpoint)
+    identifier_backend: str = "bioclip"
 
-    # CLIP zero-shot settings. ViT-L-14 is far stronger at fine-grained plant
-    # discrimination than ViT-B-32 (which confuses e.g. Monstera with ferns).
+    # BioCLIP (open-ended biodiversity model). Scores are softmax over ~450K
+    # taxa, so a confident top-1 is often ~0.3-0.9 with a large margin over the
+    # runner-up; the floor is set low to avoid flagging correct IDs as uncertain.
+    bioclip_confidence_threshold: float = 0.12
+
+    # CLIP zero-shot settings (catalog backend). ViT-L-14 is far stronger at
+    # fine-grained discrimination than ViT-B-32 (which confuses Monstera with ferns).
     clip_model: str = "ViT-L-14"
     clip_pretrained: str = "laion2b_s32b_b82k"
     clip_confidence_threshold: float = 0.30  # 15+ classes → random ≈ 0.06

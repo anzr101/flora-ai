@@ -26,11 +26,15 @@ app = FastAPI(
     description="Computer vision for plant identification (CLIP zero-shot + PyTorch transfer learning).",
 )
 
-_USING_CLIP = settings.identifier_backend == "clip"
+_BACKEND = settings.identifier_backend
 
 
 def _predict(image_bytes: bytes) -> SpeciesPrediction:
-    if _USING_CLIP:
+    if _BACKEND == "bioclip":
+        from floradl.bioclip_backend import get_bioclip
+
+        return get_bioclip().predict(image_bytes)
+    if _BACKEND == "clip":
         from floradl.zero_shot import get_zero_shot
 
         return get_zero_shot().predict(image_bytes)
@@ -40,20 +44,29 @@ def _predict(image_bytes: bytes) -> SpeciesPrediction:
 
 
 def _ready() -> bool:
-    # CLIP needs no local checkpoint; the CNN backend does.
-    return True if _USING_CLIP else CHECKPOINT.exists()
+    # BioCLIP / CLIP need no local checkpoint; the CNN backend does.
+    return CHECKPOINT.exists() if _BACKEND == "cnn" else True
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "backend": settings.identifier_backend, "model_loaded": _ready()}
+    return {"status": "ok", "backend": _BACKEND, "model_loaded": _ready()}
 
 
 @app.get("/info")
 def info() -> dict:
     if not _ready():
-        raise HTTPException(503, "Model not available. Train the CNN or use the CLIP backend.")
-    if _USING_CLIP:
+        raise HTTPException(503, "Model not available. Train the CNN or use BioCLIP/CLIP.")
+    if _BACKEND == "bioclip":
+        from floradl.bioclip_backend import get_bioclip
+
+        return {
+            "backend": "bioclip-tree-of-life",
+            "model_version": get_bioclip().version,
+            "open_vocabulary": True,
+            "coverage": "~450,000 taxa across the biological tree of life",
+        }
+    if _BACKEND == "clip":
         from floradl.zero_shot import SPECIES_CATALOG, get_zero_shot
 
         return {
