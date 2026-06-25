@@ -12,12 +12,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
+  // Subtle top-lit gradient + inner highlight for a premium, tactile feel.
   primary:
-    "bg-forest text-ivory shadow-sm hover:shadow-md hover:bg-forest/92 active:translate-y-px",
+    "bg-gradient-to-b from-[rgb(34_82_61)] to-forest text-ivory shadow-md hover:shadow-lg hover:brightness-[1.06] active:translate-y-px [box-shadow:inset_0_1px_0_0_rgb(255_255_255_/_0.08),0_4px_16px_-4px_rgb(27_67_50_/_0.3)]",
   secondary:
-    "bg-leaf text-white shadow-sm hover:bg-leaf/90 hover:shadow-md active:translate-y-px",
+    "bg-gradient-to-b from-[rgb(96_198_152)] to-leaf text-white shadow-sm hover:shadow-md hover:brightness-[1.05] active:translate-y-px",
   outline:
-    "border border-line bg-surface text-ink hover:border-leaf/50 hover:bg-leaf/[0.04]",
+    "border border-line bg-surface/80 text-ink backdrop-blur-sm hover:border-leaf/50 hover:bg-leaf/[0.05] hover:shadow-sm",
   ghost: "text-ink/80 hover:bg-forest/[0.05] hover:text-forest",
 };
 

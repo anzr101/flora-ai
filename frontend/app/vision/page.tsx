@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ScanEye } from "lucide-react";
+import { Info, ScanEye } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -11,6 +11,9 @@ import { ImageDropzone } from "@/components/modules/ImageDropzone";
 import { SpeciesResult } from "@/components/modules/SpeciesResult";
 import { identifySpecies } from "@/lib/api";
 import type { SpeciesPrediction } from "@/lib/types";
+
+// The four categories the bundled demo model can return (synthetic placeholder).
+const DEMO_CATEGORIES = ["Monstera Deliciosa", "Golden Pothos", "Snake Plant", "Peace Lily"];
 
 export default function VisionPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -54,12 +57,30 @@ export default function VisionPage() {
             {loading ? <Spinner className="h-4 w-4 text-ivory" /> : "Identify species"}
           </Button>
           {error && <p className="mt-3 text-[0.84rem] text-danger">{error}</p>}
-          <p className="mt-4 text-[0.78rem] leading-relaxed text-muted">
-            Note: the bundled demo model is trained on a synthetic smoke dataset,
-            so it will report low confidence on real photos — which is the honest,
-            intended behaviour. Point it at a real PlantVillage-trained checkpoint
-            for production accuracy.
-          </p>
+
+          <div className="mt-5 rounded-lg border border-line bg-leaf/[0.03] p-4">
+            <p className="flex items-center gap-1.5 text-[0.74rem] font-medium uppercase tracking-[0.12em] text-muted">
+              <Info className="h-3.5 w-3.5" /> About this demo model
+            </p>
+            <p className="mt-2 text-[0.82rem] leading-relaxed text-ink/75">
+              This bundled model is trained on a small <strong>synthetic placeholder
+              dataset</strong>, so it recognises just four demo categories and will
+              report <strong>low confidence on real photos</strong> — that abstention
+              is the honest, intended behaviour. Swap in a PlantVillage-trained
+              checkpoint for production accuracy.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {DEMO_CATEGORIES.map((c) => (
+                <span
+                  key={c}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-[0.74rem] text-ink/70"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-leaf" />
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
         </Card>
 
         <Card className="p-7">

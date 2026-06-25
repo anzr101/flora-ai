@@ -102,30 +102,42 @@ def prepare() -> dict:
     return {"classes": classes, "counts": counts}
 
 
-def make_synthetic(n_classes: int = 4, groups_per_class: int = 12, imgs_per_group: int = 5) -> None:
+# Human-readable class names for the demo/smoke dataset. These are placeholder
+# categories so the API returns legible labels (e.g. "Monstera Deliciosa")
+# instead of "class_2"; they match plants covered by the agent knowledge base.
+# Swap in real PlantVillage class folders for a production model.
+DEMO_CLASSES = ["monstera_deliciosa", "golden_pothos", "snake_plant", "peace_lily"]
+
+
+def make_synthetic(
+    class_names: list[str] | None = None,
+    groups_per_class: int = 12,
+    imgs_per_group: int = 5,
+) -> None:
     """Create a tiny synthetic ImageFolder dataset for smoke-testing the pipeline.
 
     Each class has a distinct base colour; each 'group' (a fake plant) gets a few
     noisy variants sharing a group id in the filename, so group-aware splitting is
-    actually exercised.
+    actually exercised. Classes use real plant names so the demo output is legible.
     """
     from PIL import Image
 
+    class_names = class_names or DEMO_CLASSES
     rng = np.random.default_rng(settings.seed)
     if RAW_DIR.exists():
         shutil.rmtree(RAW_DIR)
 
-    base_colors = rng.integers(40, 215, size=(n_classes, 3))
-    for c in range(n_classes):
-        cls_dir = RAW_DIR / f"class_{c}"
+    base_colors = rng.integers(40, 215, size=(len(class_names), 3))
+    for c, name in enumerate(class_names):
+        cls_dir = RAW_DIR / name
         cls_dir.mkdir(parents=True, exist_ok=True)
         for g in range(groups_per_class):
             for j in range(imgs_per_group):
                 arr = base_colors[c] + rng.normal(0, 18, size=(64, 64, 3))
                 arr = np.clip(arr, 0, 255).astype(np.uint8)
                 Image.fromarray(arr).save(cls_dir / f"plant{g}_img{j}.jpg")
-    total = n_classes * groups_per_class * imgs_per_group
-    print(f"Wrote {total} synthetic images across {n_classes} classes -> {RAW_DIR}")
+    total = len(class_names) * groups_per_class * imgs_per_group
+    print(f"Wrote {total} synthetic images across {len(class_names)} classes -> {RAW_DIR}")
 
 
 def main() -> None:

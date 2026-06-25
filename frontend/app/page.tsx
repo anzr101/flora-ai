@@ -11,7 +11,15 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Reveal } from "@/components/ui/Reveal";
+import { Aurora } from "@/components/ui/Aurora";
 import { LogoMark } from "@/components/brand/Logo";
+
+const STATS = [
+  { v: "0.72", l: "macro-F1", s: "health model" },
+  { v: "1.00", l: "hit@4", s: "RAG retrieval" },
+  { v: "4", l: "microservices", s: "independently deployed" },
+  { v: "100%", l: "cited", s: "grounded answers" },
+];
 
 const MODULES = [
   {
@@ -48,8 +56,9 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        <div className="container-flora grid items-center gap-12 py-20 md:py-28 lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="grain relative overflow-hidden">
+        <Aurora />
+        <div className="container-flora relative z-10 grid items-center gap-12 py-20 md:py-28 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="animate-fade-up">
             <span className="eyebrow">
               <Sparkles className="h-3.5 w-3.5 text-leaf" />
@@ -57,7 +66,7 @@ export default function HomePage() {
             </span>
             <h1 className="mt-5 font-display text-display-lg text-forest">
               Organic intelligence for{" "}
-              <span className="italic text-leaf">living things.</span>
+              <span className="text-gradient italic">living things.</span>
             </h1>
             <p className="mt-6 max-w-xl text-[1.12rem] leading-relaxed text-muted">
               FloraAI is an AI ecosystem for understanding plants — combining
@@ -92,9 +101,9 @@ export default function HomePage() {
 
           {/* Visual: layered botanical glass panel */}
           <div className="relative animate-fade-up [animation-delay:120ms]">
-            <div className="relative mx-auto aspect-square w-full max-w-md">
+            <div className="animate-float-card relative mx-auto aspect-square w-full max-w-md">
               <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-sage/30 via-leaf/10 to-transparent blur-2xl" />
-              <Card className="relative h-full overflow-hidden rounded-[2rem] border-leaf/15 p-8 shadow-lg">
+              <Card className="relative h-full overflow-hidden rounded-[2rem] border-leaf/15 bg-surface/80 p-8 shadow-lg backdrop-blur-xl">
                 <div className="flex items-center justify-between">
                   <LogoMark className="h-9 w-9" />
                   <span className="font-mono text-[0.7rem] text-muted">live · gateway</span>
@@ -117,6 +126,23 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ── Credibility strip ─────────────────────────────────────────── */}
+      <section className="container-flora">
+        <Reveal>
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line/60 md:grid-cols-4">
+            {STATS.map((stat) => (
+              <div key={stat.l} className="bg-surface px-6 py-7 text-center sm:py-8">
+                <div className="font-display text-[2.2rem] leading-none text-forest">
+                  {stat.v}
+                </div>
+                <div className="mt-2 text-[0.82rem] font-medium text-ink">{stat.l}</div>
+                <div className="mt-0.5 text-[0.72rem] text-muted">{stat.s}</div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
       </section>
 
       {/* ── Modules ───────────────────────────────────────────────────── */}
@@ -142,8 +168,10 @@ export default function HomePage() {
           {MODULES.map((m, i) => (
             <Reveal key={m.href} delay={i * 0.08}>
               <Link href={m.href} className="group block h-full">
-                <Card hover className="flex h-full flex-col p-7">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-leaf/10 text-forest">
+                <Card hover className="relative flex h-full flex-col overflow-hidden p-7">
+                  {/* Top accent that grows on hover. */}
+                  <span className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-leaf to-success transition-transform duration-500 ease-organic group-hover:scale-x-100" />
+                  <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-leaf/20 to-sage/20 text-forest ring-1 ring-leaf/10 transition-transform duration-300 ease-organic group-hover:scale-105">
                     <m.icon className="h-5 w-5" />
                   </span>
                   <p className="mt-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] text-leaf">
@@ -167,7 +195,9 @@ export default function HomePage() {
       {/* ── How it works ──────────────────────────────────────────────── */}
       <section className="container-flora py-12 md:py-20">
         <Reveal>
-          <div className="rounded-2xl border border-line bg-surface p-8 shadow-sm md:p-12">
+          <div className="grain relative overflow-hidden rounded-2xl border border-line bg-surface p-8 shadow-sm md:p-12">
+            <Aurora className="opacity-70" />
+            <div className="relative z-10">
             <span className="eyebrow">
               <Sparkles className="h-3.5 w-3.5 text-leaf" /> The unified flow
             </span>
@@ -191,6 +221,7 @@ export default function HomePage() {
                   Try the unified diagnosis <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
+            </div>
             </div>
           </div>
         </Reveal>
