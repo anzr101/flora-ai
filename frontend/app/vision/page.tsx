@@ -12,8 +12,13 @@ import { SpeciesResult } from "@/components/modules/SpeciesResult";
 import { identifySpecies } from "@/lib/api";
 import type { SpeciesPrediction } from "@/lib/types";
 
-// The four categories the bundled demo model can return (synthetic placeholder).
-const DEMO_CATEGORIES = ["Monstera Deliciosa", "Golden Pothos", "Snake Plant", "Peace Lily"];
+// Houseplants the zero-shot identifier recognises (open-vocabulary — extendable).
+const SUPPORTED_SPECIES = [
+  "Monstera deliciosa", "Snake plant", "Golden pothos", "Peace lily",
+  "Fiddle-leaf fig", "Rubber plant", "ZZ plant", "Spider plant",
+  "Aloe vera", "Jade plant", "Boston fern", "Calathea",
+  "Philodendron", "English ivy", "Chinese evergreen", "Orchid",
+];
 
 export default function VisionPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -39,7 +44,7 @@ export default function VisionPage() {
       <PageHeader
         eyebrow="Module 02 · Deep Learning"
         title="Visual identification"
-        description="A transfer-learned convolutional model classifies a leaf image. It reports confidence and abstains on out-of-distribution photos rather than guessing."
+        description="Upload a plant photo and the vision model identifies the species. It reports calibrated confidence and abstains when the image is unclear rather than guessing."
       />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -60,17 +65,18 @@ export default function VisionPage() {
 
           <div className="mt-5 rounded-lg border border-line bg-leaf/[0.03] p-4">
             <p className="flex items-center gap-1.5 text-[0.74rem] font-medium uppercase tracking-[0.12em] text-muted">
-              <Info className="h-3.5 w-3.5" /> About this demo model
+              <Info className="h-3.5 w-3.5" /> How identification works
             </p>
             <p className="mt-2 text-[0.82rem] leading-relaxed text-ink/75">
-              This bundled model is trained on a small <strong>synthetic placeholder
-              dataset</strong>, so it recognises just four demo categories and will
-              report <strong>low confidence on real photos</strong> — that abstention
-              is the honest, intended behaviour. Swap in a PlantVillage-trained
-              checkpoint for production accuracy.
+              This uses <strong>CLIP zero-shot</strong> recognition — your photo is
+              matched against text descriptions of each plant, so it works on
+              <strong> real photos with no training data</strong>. It's
+              open-vocabulary: new species are added with a sentence, not a
+              retraining run. Currently recognises {SUPPORTED_SPECIES.length} common
+              houseplants.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {DEMO_CATEGORIES.map((c) => (
+              {SUPPORTED_SPECIES.slice(0, 8).map((c) => (
                 <span
                   key={c}
                   className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-[0.74rem] text-ink/70"
@@ -79,6 +85,9 @@ export default function VisionPage() {
                   {c}
                 </span>
               ))}
+              <span className="inline-flex items-center rounded-full border border-line bg-surface px-2.5 py-1 text-[0.74rem] text-muted">
+                +{SUPPORTED_SPECIES.length - 8} more
+              </span>
             </div>
           </div>
         </Card>

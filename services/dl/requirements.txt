@@ -4,6 +4,7 @@
 # CPU wheels by default. For GPU, install the matching CUDA build of torch.
 torch>=2.2
 torchvision>=0.17
+open-clip-torch>=2.20      # CLIP zero-shot identifier (default backend)
 pillow>=10.0
 numpy>=1.26,<2
 
