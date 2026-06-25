@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flora-common"
+version = "1.0.0"
+description = "Shared config, logging, and schemas for the FloraAI platform."
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+]
+
+[tool.setuptools]
+packages = ["flora_common"]

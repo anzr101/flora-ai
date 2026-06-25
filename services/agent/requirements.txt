@@ -1,0 +1,14 @@
+# Module 3 — Agentic RAG service.
+-e ../../shared
+
+anthropic>=0.39          # Claude (generation only)
+fastembed>=0.3           # ONNX embeddings — torch-free, small footprint
+numpy>=1.26,<2
+
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+pydantic-settings>=2.2
+httpx>=0.27              # calling the ML/DL services as tools
+
+pytest>=8.0

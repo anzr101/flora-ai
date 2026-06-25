@@ -1,0 +1,60 @@
+# Run the entire FloraAI platform. Each service builds from its own Dockerfile
+# and exposes a FastAPI app. The gateway depends on the three model services.
+#
+#   docker compose up --build
+#
+# Note: dl needs a trained checkpoint (services/dl/models/species.pt) and agent
+# needs a built vector store (services/agent/vectorstore/). Run `make dl-train`
+# and `make agent-ingest` first, or mount pre-built artifacts as below.
+
+services:
+  ml:
+    build:
+      context: .
+      dockerfile: services/ml/Dockerfile
+    image: floraai-ml:latest
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  dl:
+    build:
+      context: .
+      dockerfile: services/dl/Dockerfile
+    image: floraai-dl:latest
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./services/dl/models:/app/services/dl/models:ro
+
+  agent:
+    build:
+      context: .
+      dockerfile: services/agent/Dockerfile
+    image: floraai-agent:latest
+    env_file: .env
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./services/agent/vectorstore:/app/services/agent/vectorstore
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    image: floraai-gateway:latest
+    env_file: .env
+    environment:
+      FLORA_ML_URL: http://ml:8001
+      FLORA_DL_URL: http://dl:8002
+      FLORA_AGENT_URL: http://agent:8003
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ml
+      - dl
+      - agent

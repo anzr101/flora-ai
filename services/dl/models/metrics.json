@@ -1,0 +1,10 @@
+{
+  "best_val_acc": 0.5,
+  "test_acc": 0.4,
+  "classes": [
+    "class_0",
+    "class_1",
+    "class_2",
+    "class_3"
+  ]
+}
