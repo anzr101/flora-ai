@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ──────────────────────────────────────────────────────────
+   Colors are stored as space-separated RGB *channels* (not hex) so Tailwind can
+   inject alpha via `rgb(var(--x) / <alpha-value>)` and so dark mode can retheme
+   by swapping the channels only. */
+:root {
+  --forest: 27 67 50;       /* #1B4332 */
+  --sage: 149 213 178;      /* #95D5B2 */
+  --leaf: 82 183 136;       /* #52B788 */
+  --ivory: 248 249 245;     /* #F8F9F5 */
+  --surface: 255 255 255;   /* #FFFFFF */
+  --ink: 45 45 45;          /* #2D2D2D */
+  --muted: 95 107 99;       /* #5F6B63 */
+  --line: 231 234 227;      /* #E7EAE3 */
+  --success: 42 157 143;    /* #2A9D8F */
+  --warning: 233 196 106;   /* #E9C46A */
+  --danger: 214 40 40;      /* #D62828 */
+
+  --ease-organic: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Font families (the .variable classes are attached on <html> in layout.tsx) */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-fraunces), Georgia, serif;
+}
+
+[data-theme="dark"] {
+  --forest: 183 228 199;    /* #B7E4C7 */
+  --sage: 116 198 157;      /* #74C69D */
+  --leaf: 82 183 136;       /* #52B788 */
+  --ivory: 15 21 18;        /* #0F1512 */
+  --surface: 21 28 24;      /* #151C18 */
+  --ink: 238 242 236;       /* #EEF2EC */
+  --muted: 154 168 159;     /* #9AA89F */
+  --line: 36 48 41;         /* #243029 */
+  --success: 76 195 179;    /* #4CC3B3 */
+  --warning: 233 196 106;   /* #E9C46A */
+  --danger: 239 100 97;     /* #EF6461 */
+}
+
+* {
+  border-color: rgb(var(--line));
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--ivory));
+  color: rgb(var(--ink));
+  font-feature-settings: "cv01", "ss01";
+}
+
+/* Subtle organic page texture: a barely-there radial wash, never distracting. */
+.bg-canvas {
+  background-color: rgb(var(--ivory));
+  background-image:
+    radial-gradient(60rem 60rem at 85% -10%, rgb(var(--sage) / 0.16), transparent 60%),
+    radial-gradient(50rem 50rem at -10% 10%, rgb(var(--leaf) / 0.08), transparent 55%);
+}
+
+/* ── Reusable component classes ─────────────────────────────────────────── */
+@layer components {
+  .container-flora {
+    @apply mx-auto w-full max-w-content px-6 md:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-muted;
+  }
+
+  .card-surface {
+    @apply rounded-xl border border-line bg-surface shadow-sm;
+  }
+
+  /* Focus ring used across inputs/buttons for a consistent, calm a11y state. */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-ivory focus-visible:ring-2 focus-visible:ring-leaf/60;
+  }
+}
+
+/* Skeleton shimmer for loading states. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgb(var(--line) / 0.7);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(var(--surface) / 0.6), transparent);
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Thin, refined scrollbars to match the calm aesthetic. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--muted) / 0.35);
+  border-radius: 999px;
+  border: 3px solid rgb(var(--ivory));
+}

@@ -66,11 +66,12 @@ def predict_health(conditions: dict) -> HealthPrediction | None:
         return None
 
 
-def ask_agent(message: str) -> AgentResponse | None:
+def ask_agent(message: str, history: list | None = None) -> AgentResponse | None:
     try:
+        payload = AgentRequest(message=message, history=history or []).model_dump()
         r = httpx.post(
             f"{settings.agent_url}/chat",
-            json=AgentRequest(message=message).model_dump(),
+            json=payload,
             timeout=settings.request_timeout,
         )
         r.raise_for_status()

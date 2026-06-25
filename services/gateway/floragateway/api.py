@@ -10,9 +10,17 @@ and degrades gracefully when any of them is unavailable.
 
 from __future__ import annotations
 
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from flora_common import get_logger
-from flora_common.schemas import DiagnoseResponse
+from flora_common.schemas import (
+    AgentRequest,
+    AgentResponse,
+    DiagnoseResponse,
+    HealthPrediction,
+    PlantConditions,
+    SpeciesPrediction,
+)
 
 from floragateway import clients
 from floragateway.config import settings
@@ -23,6 +31,18 @@ app = FastAPI(
     title="FloraAI · Gateway",
     version="1.0.0",
     description="Orchestrates the ML, DL, and Agent services into one botanical AI flow.",
+)
+
+# Allow the Next.js frontend (dev + common local ports) to call the gateway.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 _CONDITION_FIELDS = [
@@ -40,6 +60,39 @@ _CONDITION_FIELDS = [
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "service": "gateway", "downstream": clients.downstream_health()}
+
+
+# ── Single-origin proxy routes (frontend talks only to the gateway) ───────────
+@app.post("/api/predict", response_model=HealthPrediction)
+def api_predict(conditions: PlantConditions) -> HealthPrediction:
+    """Proxy → ML service. Lets the frontend use one base URL + one CORS origin."""
+    result = clients.predict_health(conditions.model_dump())
+    if result is None:
+        raise HTTPException(502, "ML service is unavailable.")
+    return result
+
+
+@app.post("/api/identify", response_model=SpeciesPrediction)
+async def api_identify(file: UploadFile = File(...)) -> SpeciesPrediction:
+    """Proxy → DL service (image classification)."""
+    if not (file.content_type or "").startswith("image/"):
+        raise HTTPException(400, "Uploaded file must be an image.")
+    image_bytes = await file.read()
+    result = clients.identify_species(
+        image_bytes, file.filename or "upload.jpg", file.content_type or "image/jpeg"
+    )
+    if result is None:
+        raise HTTPException(502, "Vision service is unavailable.")
+    return result
+
+
+@app.post("/api/chat", response_model=AgentResponse)
+def api_chat(req: AgentRequest) -> AgentResponse:
+    """Proxy → Agent service (RAG chat with history)."""
+    result = clients.ask_agent(req.message, [m.model_dump() for m in req.history])
+    if result is None:
+        raise HTTPException(502, "Assistant service is unavailable.")
+    return result
 
 
 @app.post("/diagnose", response_model=DiagnoseResponse)

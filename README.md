@@ -15,6 +15,7 @@ production AI systems are actually composed:
 | **`services/dl`** | Deep Learning (PyTorch) | Plant **disease / species** recognition | Leaf images |
 | **`services/agent`** | Agentic RAG (Claude + local embeddings) | Botanical **reasoning & care advice** | Natural language |
 | **`services/gateway`** | Orchestration (FastAPI) | The **unified flow** that combines all three | Image + conditions + question |
+| **`frontend/`** | Next.js 14 + TypeScript | Premium product UI over the whole platform | Browser |
 
 ## The unified flow (what makes this more than three demos)
 
@@ -56,7 +57,10 @@ make agent-serve              # http://localhost:8003/docs
 # 4. Gateway — orchestrates everything
 make gateway-serve            # http://localhost:8000/docs
 
-# …or run the whole platform in containers:
+# 5. Frontend — the premium product UI (talks to the gateway)
+cd frontend && npm install && npm run dev   # http://localhost:3000
+
+# …or run the whole backend in containers:
 docker compose up --build
 ```
 
