@@ -18,8 +18,14 @@ const config: Config = {
         // Channel-triplet CSS vars (declared in globals.css) so Tailwind opacity
         // modifiers (bg-leaf/10, ring-leaf/60, …) work AND dark mode can retheme.
         forest: "rgb(var(--forest) / <alpha-value>)",
+        canopy: "rgb(var(--canopy) / <alpha-value>)",
+        moss: "rgb(var(--moss) / <alpha-value>)",
+        fern: "rgb(var(--fern) / <alpha-value>)",
         sage: "rgb(var(--sage) / <alpha-value>)",
         leaf: "rgb(var(--leaf) / <alpha-value>)",
+        dawn: "rgb(var(--dawn) / <alpha-value>)",
+        clay: "rgb(var(--clay) / <alpha-value>)",
+        mist: "rgb(var(--mist) / <alpha-value>)",
         ivory: "rgb(var(--ivory) / <alpha-value>)",
         surface: "rgb(var(--surface) / <alpha-value>)",
         ink: "rgb(var(--ink) / <alpha-value>)",
@@ -52,7 +58,10 @@ const config: Config = {
         sm: "0 1px 3px rgba(27, 67, 50, 0.06), 0 1px 2px rgba(27, 67, 50, 0.04)",
         md: "0 4px 16px -4px rgba(27, 67, 50, 0.08), 0 2px 6px -2px rgba(27, 67, 50, 0.05)",
         lg: "0 18px 40px -12px rgba(27, 67, 50, 0.14), 0 6px 14px -6px rgba(27, 67, 50, 0.08)",
-        glow: "0 0 0 1px rgba(82, 183, 136, 0.25), 0 10px 30px -10px rgba(82, 183, 136, 0.35)",
+        // Soft, diffuse "daylight" depth — large and low-alpha, never harsh.
+        soft: "0 2px 8px -2px rgba(20, 43, 32, 0.05), 0 16px 40px -16px rgba(20, 43, 32, 0.12)",
+        lift: "0 8px 18px -6px rgba(20, 43, 32, 0.10), 0 28px 60px -24px rgba(20, 43, 32, 0.20)",
+        glow: "0 0 0 1px rgba(82, 183, 136, 0.22), 0 18px 50px -18px rgba(82, 183, 136, 0.4)",
       },
       maxWidth: {
         content: "1180px",

@@ -2,43 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design tokens ──────────────────────────────────────────────────────────
-   Colors are stored as space-separated RGB *channels* (not hex) so Tailwind can
-   inject alpha via `rgb(var(--x) / <alpha-value>)` and so dark mode can retheme
-   by swapping the channels only. */
+/* ── Design tokens — "The Conservatory" ─────────────────────────────────────
+   A botanical sanctuary: dawn light, mist, deep canopy. Colors are stored as
+   space-separated RGB channels so Tailwind can inject alpha via
+   `rgb(var(--x) / <alpha-value>)` and dark mode reskins by swapping channels. */
 :root {
-  --forest: 27 67 50;       /* #1B4332 */
-  --sage: 149 213 178;      /* #95D5B2 */
-  --leaf: 82 183 136;       /* #52B788 */
-  --ivory: 248 249 245;     /* #F8F9F5 */
-  --surface: 255 255 255;   /* #FFFFFF */
-  --ink: 45 45 45;          /* #2D2D2D */
-  --muted: 95 107 99;       /* #5F6B63 */
-  --line: 231 234 227;      /* #E7EAE3 */
-  --success: 42 157 143;    /* #2A9D8F */
-  --warning: 233 196 106;   /* #E9C46A */
-  --danger: 214 40 40;      /* #D62828 */
+  --forest: 27 67 50;       /* deep forest — primary dark */
+  --canopy: 16 43 32;       /* deeper canopy shadow */
+  --moss: 60 116 88;        /* mid green */
+  --fern: 122 168 132;      /* muted sage-green */
+  --leaf: 82 183 136;       /* living accent */
+  --sage: 149 213 178;      /* soft new-growth */
+  --dawn: 240 209 162;      /* warm morning light */
+  --clay: 183 143 107;      /* earthen accent (used sparingly) */
+  --mist: 234 240 232;      /* soft green-white */
+  --ivory: 247 246 239;     /* warm paper */
+  --surface: 252 251 246;   /* warm card surface */
+  --ink: 36 45 39;          /* warm near-black, green-tinted */
+  --muted: 92 105 96;       /* secondary text */
+  --line: 225 227 216;      /* warm hairline */
+  --success: 42 157 143;
+  --warning: 224 175 92;
+  --danger: 198 76 65;
 
   --ease-organic: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Font families (the .variable classes are attached on <html> in layout.tsx) */
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-display: var(--font-fraunces), Georgia, serif;
 }
 
 [data-theme="dark"] {
-  --forest: 183 228 199;    /* #B7E4C7 */
-  --sage: 116 198 157;      /* #74C69D */
-  --leaf: 82 183 136;       /* #52B788 */
-  --ivory: 15 21 18;        /* #0F1512 */
-  --surface: 21 28 24;      /* #151C18 */
-  --ink: 238 242 236;       /* #EEF2EC */
-  --muted: 154 168 159;     /* #9AA89F */
-  --line: 36 48 41;         /* #243029 */
-  --success: 76 195 179;    /* #4CC3B3 */
-  --warning: 233 196 106;   /* #E9C46A */
-  --danger: 239 100 97;     /* #EF6461 */
+  --forest: 183 228 199;
+  --canopy: 8 16 12;
+  --moss: 116 198 157;
+  --fern: 120 150 128;
+  --leaf: 82 183 136;
+  --sage: 116 198 157;
+  --dawn: 96 74 47;
+  --clay: 150 116 86;
+  --mist: 28 38 31;
+  --ivory: 10 16 12;
+  --surface: 17 25 19;
+  --ink: 232 239 229;
+  --muted: 150 165 152;
+  --line: 35 47 39;
+  --success: 76 195 179;
+  --warning: 224 175 92;
+  --danger: 230 120 110;
 }
 
 * {
@@ -57,94 +68,83 @@ body {
   font-feature-settings: "cv01", "ss01";
 }
 
-/* Subtle organic page texture: a barely-there radial wash, never distracting. */
-.bg-canvas {
-  background-color: rgb(var(--ivory));
-  background-image:
-    radial-gradient(60rem 60rem at 85% -10%, rgb(var(--sage) / 0.16), transparent 60%),
-    radial-gradient(50rem 50rem at -10% 10%, rgb(var(--leaf) / 0.08), transparent 55%);
-}
-
 /* ── Reusable component classes ─────────────────────────────────────────── */
 @layer components {
   .container-flora {
-    @apply mx-auto w-full max-w-content px-6 md:px-8;
+    @apply mx-auto w-full max-w-[1180px] px-6 md:px-10;
+  }
+  .container-narrow {
+    @apply mx-auto w-full max-w-[920px] px-6 md:px-10;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-muted;
+    @apply inline-flex items-center gap-2.5 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-moss;
   }
 
   .card-surface {
-    @apply rounded-xl border border-line bg-surface shadow-sm;
+    @apply rounded-[26px] border border-line/80 bg-surface/90 shadow-soft backdrop-blur-sm;
   }
 
-  /* Focus ring used across inputs/buttons for a consistent, calm a11y state. */
+  /* Calm, accessible focus ring. */
   .focus-ring {
-    @apply outline-none ring-offset-2 ring-offset-ivory focus-visible:ring-2 focus-visible:ring-leaf/60;
+    @apply outline-none ring-offset-2 ring-offset-ivory focus-visible:ring-2 focus-visible:ring-leaf/55;
+  }
+
+  /* Hero / accent gradient ink — dawn through canopy. */
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      rgb(var(--moss)),
+      rgb(var(--leaf)) 45%,
+      rgb(var(--forest))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
 
-/* ── Spectacular touches ────────────────────────────────────────────────── */
-
-/* Editorial gradient text for accent words. */
-.text-gradient {
-  background-image: linear-gradient(
-    105deg,
-    rgb(var(--leaf)),
-    rgb(var(--success)) 55%,
-    rgb(var(--forest))
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* ── Living motion (ambient, CSS-driven, GPU-cheap) ─────────────────────── */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+@keyframes drift-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(2.5%, -2%, 0) rotate(2deg); }
+}
+@keyframes drift-slower {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-3%, 2.5%, 0) rotate(-2.5deg); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
+}
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }
 
-/* Fine film grain — adds premium texture without distraction. Scoped, decorative. */
+.animate-breathe { animation: breathe 9s var(--ease-organic) infinite; }
+.animate-drift { animation: drift-slow 22s ease-in-out infinite; }
+.animate-drift-2 { animation: drift-slower 28s ease-in-out infinite; }
+.animate-sway { animation: sway 7s ease-in-out infinite; transform-origin: top center; }
+.animate-float-soft { animation: float-soft 8s var(--ease-organic) infinite; }
+
+/* Fine film grain — organic texture, scoped/decorative, behind content. */
 .grain::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.5;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-}
-
-/* Slow organic drift for the aurora blobs. */
-@keyframes drift-a {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(4%, -3%, 0) scale(1.08); }
-}
-@keyframes drift-b {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-5%, 4%, 0) scale(1.12); }
-}
-@keyframes float-card {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.animate-float-card {
-  animation: float-card 7s var(--ease-organic) infinite;
-}
-
-/* Gradient hairline divider. */
-.rule-gradient {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgb(var(--line)),
-    rgb(var(--leaf) / 0.4),
-    rgb(var(--line)),
-    transparent
-  );
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-float-card,
-  .animate-fade-up { animation: none !important; }
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
 }
 
 /* Skeleton shimmer for loading states. */
@@ -161,19 +161,19 @@ body {
   background: linear-gradient(90deg, transparent, rgb(var(--surface) / 0.6), transparent);
   animation: shimmer 1.6s infinite;
 }
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
 
-/* Thin, refined scrollbars to match the calm aesthetic. */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+/* Thin, refined scrollbars. */
+::-webkit-scrollbar { width: 11px; height: 11px; }
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--muted) / 0.35);
+  background: rgb(var(--moss) / 0.3);
   border-radius: 999px;
   border: 3px solid rgb(var(--ivory));
+}
+
+::selection { background: rgb(var(--leaf) / 0.22); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-breathe, .animate-drift, .animate-drift-2, .animate-sway,
+  .animate-float-soft { animation: none !important; }
+  html { scroll-behavior: auto; }
 }

@@ -8,9 +8,9 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-line bg-surface shadow-sm",
+        "rounded-[26px] border border-line/70 bg-surface/85 shadow-soft backdrop-blur-md",
         hover &&
-          "transition-all duration-300 ease-organic hover:-translate-y-0.5 hover:shadow-md",
+          "transition-all duration-500 ease-organic hover:-translate-y-1 hover:shadow-lift",
         className,
       )}
       {...props}
@@ -22,14 +22,14 @@ export function CardHeader({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-6 pb-3", className)} {...props} />;
+  return <div className={cn("p-7 pb-3", className)} {...props} />;
 }
 
 export function CardBody({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-6 pt-0", className)} {...props} />;
+  return <div className={cn("p-7 pt-0", className)} {...props} />;
 }
 
 export function CardTitle({

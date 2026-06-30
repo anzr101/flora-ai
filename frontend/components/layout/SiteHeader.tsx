@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/diagnose", label: "Diagnose" },
-  { href: "/health", label: "Health" },
-  { href: "/vision", label: "Vision" },
-  { href: "/assistant", label: "Assistant" },
+  { href: "/vision", label: "Identify" },
+  { href: "/health", label: "Wellbeing" },
+  { href: "/assistant", label: "Companion" },
 ];
 
 export function SiteHeader() {
@@ -30,13 +30,13 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line/70 bg-ivory/80 backdrop-blur-xl">
-      <div className="container-flora flex h-16 items-center justify-between">
-        <Link href="/" className="focus-ring rounded-sm" aria-label="FloraAI home">
+    <header className="sticky top-0 z-50 border-b border-line/50 bg-ivory/55 backdrop-blur-xl">
+      <div className="container-flora flex h-[4.5rem] items-center justify-between">
+        <Link href="/" className="focus-ring rounded-full" aria-label="FloraAI home">
           <Wordmark />
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center rounded-full border border-line/60 bg-surface/50 px-1.5 py-1 backdrop-blur-md md:flex">
           {NAV.map((item) => {
             const active = pathname === item.href;
             return (
@@ -44,38 +44,38 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "focus-ring relative rounded-sm px-3.5 py-2 text-[0.88rem] transition-colors",
-                  active ? "text-forest" : "text-muted hover:text-forest",
+                  "focus-ring rounded-full px-4 py-1.5 text-[0.86rem] transition-colors duration-300",
+                  active
+                    ? "bg-forest/[0.06] text-forest"
+                    : "text-muted hover:text-forest",
                 )}
               >
                 {item.label}
-                {active && (
-                  <span className="absolute inset-x-3.5 -bottom-px h-px bg-leaf" />
-                )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <span
-            className="hidden items-center gap-2 text-[0.76rem] text-muted sm:inline-flex"
-            title={online === null ? "Checking…" : online ? "Platform online" : "Platform offline"}
+            className="hidden items-center gap-2 text-[0.74rem] text-moss sm:inline-flex"
+            title={online === null ? "Listening…" : online ? "The garden is awake" : "Resting"}
           >
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full",
-                online === null
-                  ? "bg-muted/40"
-                  : online
-                    ? "bg-success animate-pulse"
-                    : "bg-danger",
+            <span className="relative flex h-2 w-2">
+              {online && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-leaf/60" />
               )}
-            />
-            {online === null ? "Connecting" : online ? "Systems online" : "Offline"}
+              <span
+                className={cn(
+                  "relative inline-flex h-2 w-2 rounded-full",
+                  online === null ? "bg-muted/40" : online ? "bg-leaf" : "bg-clay",
+                )}
+              />
+            </span>
+            {online === null ? "Listening" : online ? "Awake" : "Resting"}
           </span>
           <Link href="/diagnose">
-            <Button size="sm">Try the demo</Button>
+            <Button size="sm">Begin</Button>
           </Link>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import { Fraunces } from "next/font/google";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { Atmosphere } from "@/components/atmosphere/Atmosphere";
 import "./globals.css";
 
 // Editorial serif for large display headings — botanical-museum character,
@@ -36,7 +37,8 @@ export default function RootLayout({
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}
     >
-      <body className="bg-canvas min-h-screen font-sans antialiased">
+      <body className="min-h-screen font-sans antialiased">
+        <Atmosphere />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
           <main className="flex-1">{children}</main>
