@@ -35,7 +35,6 @@ class DLSettings(BaseSettings):
 
     # Which identifier the API serves:
     #   "bioclip" → BioCLIP tree-of-life, identifies ANY of ~450K taxa (default)
-    #   "clip"    → CLIP zero-shot over a fixed 16-houseplant catalog
     #   "cnn"     → the supervised transfer-learning model (needs a checkpoint)
     identifier_backend: str = "bioclip"
 
@@ -43,12 +42,6 @@ class DLSettings(BaseSettings):
     # taxa, so a confident top-1 is often ~0.3-0.9 with a large margin over the
     # runner-up; the floor is set low to avoid flagging correct IDs as uncertain.
     bioclip_confidence_threshold: float = 0.12
-
-    # CLIP zero-shot settings (catalog backend). ViT-L-14 is far stronger at
-    # fine-grained discrimination than ViT-B-32 (which confuses Monstera with ferns).
-    clip_model: str = "ViT-L-14"
-    clip_pretrained: str = "laion2b_s32b_b82k"
-    clip_confidence_threshold: float = 0.30  # 15+ classes → random ≈ 0.06
 
 
 settings = DLSettings()

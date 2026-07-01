@@ -1,21 +1,27 @@
 # FloraAI · Module 2 — Deep Learning (Computer Vision)
 
-**Problem:** classify a plant/leaf **image** into a species/disease class.
+**Problem:** identify the plant **species** in an image.
 
-**Why deep learning:** images are high-dimensional with spatial structure that
-convolutions exploit — classical ML cannot. We use **transfer learning** from an
-ImageNet-pretrained backbone, which is the data-efficient, production-standard
-approach.
+**Two backends** (choose with `FLORA_DL_IDENTIFIER_BACKEND`):
 
-## The two decisions that make this honest
+1. **`bioclip` (default, served):** open-ended identification with **BioCLIP** — a
+   CLIP-style vision model pre-trained on 10M images across the biological tree of
+   life. It matches a photo against ~450,000 species with no task-specific
+   training, so it works on real photos of any plant. See `bioclip_backend.py`.
+2. **`cnn` (baseline):** a **transfer-learning** classifier I built end-to-end
+   (frozen ImageNet MobileNetV3 backbone + a fresh head) to demonstrate the
+   supervised CV lifecycle. See `model.py`, `train.py`.
+
+**Why two:** BioCLIP gives real-world accuracy without a labelled dataset; the CNN
+pipeline shows the fundamentals (data → transfer learning → evaluation → serving).
+
+## Good-practice decisions in the CNN pipeline (interview-relevant)
 1. **Group-aware split** (`data.py`): the same physical leaf never spans
    train/val/test, so accuracy reflects generalisation, not memorisation of
-   near-duplicate augmentations. A naive random split inflates PlantVillage
-   accuracy to a meaningless ~99%.
+   near-duplicate augmentations. A naive random split inflates accuracy.
 2. **Out-of-distribution test** (`evaluate.py --ood`): report accuracy on
-   real-world field photos, not just clean studio images. The drop is expected
-   and is the point — PlantVillage models are known to cheat off backgrounds.
-3. **Abstention** (`inference.py`): below a confidence threshold the API returns
+   real-world photos, not just clean studio images — the honest number.
+3. **Abstention** (both backends): below a confidence threshold the API returns
    `low_confidence=True` instead of a confident wrong label.
 
 ## Run
@@ -23,17 +29,14 @@ approach.
 ```bash
 pip install -r requirements.txt        # CPU torch by default
 
-# Option A — real data: drop PlantVillage into data/raw/<class>/*.jpg, then:
-python -m floradl.data --prepare
-
-# Option B — smoke test the whole pipeline with synthetic data:
-python -m floradl.data --synthetic
-python -m floradl.data --prepare
-
-python -m floradl.train                # transfer learning -> models/species.pt
-python -m floradl.evaluate             # in-distribution test acc
-python -m floradl.evaluate --ood <dir> # out-of-distribution drop
+# Default backend is BioCLIP — no training needed, just serve:
 uvicorn floradl.api:app --port 8002    # http://localhost:8002/docs
+
+# To train + serve the CNN baseline instead:
+python -m floradl.data --synthetic     # (or drop real images in data/raw/<class>/)
+python -m floradl.data --prepare
+python -m floradl.train                # transfer learning -> models/species.pt
+FLORA_DL_IDENTIFIER_BACKEND=cnn uvicorn floradl.api:app --port 8002
 pytest                                 # split + model tests
 ```
 

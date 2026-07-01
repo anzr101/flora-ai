@@ -5,8 +5,8 @@
   POST /identify   multipart image upload -> SpeciesPrediction (with abstention)
 
 Two interchangeable backends (set FLORA_DL_IDENTIFIER_BACKEND):
-  • "clip" (default) — CLIP zero-shot, open-vocabulary, works on real photos.
-  • "cnn"            — the supervised transfer-learning checkpoint.
+  • "bioclip" (default) — open-ended identification across ~450K species.
+  • "cnn"               — the supervised transfer-learning checkpoint (baseline).
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ log = get_logger("floradl.api")
 app = FastAPI(
     title="FloraAI · DL Service",
     version="1.1.0",
-    description="Computer vision for plant identification (CLIP zero-shot + PyTorch transfer learning).",
+    description="Computer vision for plant identification (BioCLIP + PyTorch transfer learning).",
 )
 
 _BACKEND = settings.identifier_backend
@@ -34,17 +34,13 @@ def _predict(image_bytes: bytes) -> SpeciesPrediction:
         from floradl.bioclip_backend import get_bioclip
 
         return get_bioclip().predict(image_bytes)
-    if _BACKEND == "clip":
-        from floradl.zero_shot import get_zero_shot
-
-        return get_zero_shot().predict(image_bytes)
     from floradl.inference import get_classifier
 
     return get_classifier().predict(image_bytes)
 
 
 def _ready() -> bool:
-    # BioCLIP / CLIP need no local checkpoint; the CNN backend does.
+    # BioCLIP needs no local checkpoint; the CNN backend does.
     return CHECKPOINT.exists() if _BACKEND == "cnn" else True
 
 
@@ -56,7 +52,7 @@ def health() -> dict:
 @app.get("/info")
 def info() -> dict:
     if not _ready():
-        raise HTTPException(503, "Model not available. Train the CNN or use BioCLIP/CLIP.")
+        raise HTTPException(503, "Model not available. Train the CNN or use BioCLIP.")
     if _BACKEND == "bioclip":
         from floradl.bioclip_backend import get_bioclip
 
@@ -65,15 +61,6 @@ def info() -> dict:
             "model_version": get_bioclip().version,
             "open_vocabulary": True,
             "coverage": "~450,000 taxa across the biological tree of life",
-        }
-    if _BACKEND == "clip":
-        from floradl.zero_shot import SPECIES_CATALOG, get_zero_shot
-
-        return {
-            "backend": "clip-zero-shot",
-            "model_version": get_zero_shot().version,
-            "open_vocabulary": True,
-            "classes": [label for label, _ in SPECIES_CATALOG],
         }
     from floradl.inference import get_classifier
 
