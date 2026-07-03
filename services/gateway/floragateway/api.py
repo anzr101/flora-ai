@@ -22,7 +22,7 @@ from flora_common.schemas import (
     SpeciesPrediction,
 )
 
-from floragateway import clients
+from floragateway import clients, db
 from floragateway.config import settings
 from floragateway.orchestration import build_advice_query, fallback_advice
 
@@ -138,10 +138,34 @@ async def diagnose(
     else:
         advice, citations = fallback_advice(species, health_pred), []
 
-    return DiagnoseResponse(
+    response = DiagnoseResponse(
         species=species,
         health=health_pred,
         advice=advice,
         citations=citations,
         services_called=services_called,
     )
+
+    # Persist best-effort: a database hiccup must never fail a diagnosis.
+    try:
+        await db.save_diagnosis(
+            question=question,
+            species_label=species.label if species else None,
+            species_confidence=species.confidence if species else None,
+            health_label=health_pred.risk_label if health_pred else None,
+            health_risk_score=health_pred.risk_score if health_pred else None,
+            advice=advice,
+            citations=[c.model_dump() for c in citations],
+            services_called=services_called,
+        )
+    except Exception as exc:
+        log.warning(f"diagnosis persistence failed: {exc}")
+
+    return response
+
+
+@app.get("/history")
+async def history(limit: int = 20) -> dict:
+    """Recent persisted diagnoses — the gateway's database-backed feature."""
+    limit = max(1, min(limit, 100))
+    return {"diagnoses": await db.list_recent(limit)}

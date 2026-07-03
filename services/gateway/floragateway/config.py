@@ -13,5 +13,9 @@ class GatewaySettings(BaseSettings):
     agent_url: str = "http://localhost:8003"
     request_timeout: float = 30.0
 
+    # Diagnosis history persistence. SQLite for zero-setup dev; in production
+    # set FLORA_DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/flora
+    database_url: str = "sqlite+aiosqlite:///./flora_gateway.db"
+
 
 settings = GatewaySettings()
