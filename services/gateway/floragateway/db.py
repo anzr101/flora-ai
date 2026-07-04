@@ -61,7 +61,14 @@ def reset() -> None:
 def _factory() -> async_sessionmaker:
     global _engine, _session_factory
     if _session_factory is None:
-        _engine = create_async_engine(settings.database_url, echo=False)
+        # pre_ping + recycle: serverless Postgres (Neon) closes idle
+        # connections; stale pooled connections otherwise fail on first use.
+        _engine = create_async_engine(
+            settings.database_url,
+            echo=False,
+            pool_pre_ping=True,
+            pool_recycle=300,
+        )
         _session_factory = async_sessionmaker(_engine, expire_on_commit=False)
     return _session_factory
 
