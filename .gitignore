@@ -27,6 +27,9 @@ services/dl/data/raw/
 services/dl/data/processed/
 services/dl/models/*.pt
 services/dl/models/*.onnx
+# ...except the compact supervised CNN checkpoint (5.9 MB) — baked into the
+# deployed DL image (BioCLIP stays local-only; its weights are multi-GB).
+!services/dl/models/species.pt
 services/agent/vectorstore/
 
 # Keep directory placeholders
