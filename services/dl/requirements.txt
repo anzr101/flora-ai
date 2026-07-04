@@ -1,5 +1,4 @@
 # Module 2 — Deep Learning (computer vision) service.
--e ../../shared
 
 # CPU wheels by default. For GPU, install the matching CUDA build of torch.
 torch>=2.2

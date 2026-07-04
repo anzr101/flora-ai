@@ -1,5 +1,4 @@
 # Module 3 — Agentic RAG service.
--e ../../shared
 
 anthropic>=0.39          # Claude (generation only)
 fastembed>=0.3           # ONNX embeddings — torch-free, small footprint
