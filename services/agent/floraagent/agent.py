@@ -6,15 +6,15 @@ Flow per turn:
      and feed the results back — repeat up to `max_tool_iterations`.
   3. Return the final grounded answer with citations and the tools it used.
 
-If no ANTHROPIC_API_KEY is configured, the agent degrades to a retrieval-only
-answer so the service still demonstrates RAG without an LLM bill.
+If no ANTHROPIC_API_KEY is configured — or the Anthropic API is unreachable
+(exhausted credit, rate limit, auth, outage) — the agent degrades to a
+retrieval-only answer so the service still demonstrates RAG and never hard-fails.
 """
 
 from __future__ import annotations
 
 from flora_common import get_logger
 from flora_common.schemas import AgentRequest, AgentResponse, Citation
-
 from floraagent import tools as tools_mod
 from floraagent.config import settings
 from floraagent.retriever import retrieve_with_citations
@@ -34,14 +34,29 @@ Rules:
 """
 
 
-def _offline_answer(message: str) -> AgentResponse:
-    """Retrieval-only fallback when no LLM key is set."""
+def _offline_answer(message: str, reason: str = "no_key") -> AgentResponse:
+    """Retrieval-only fallback when the LLM is unavailable.
+
+    `reason="no_key"` means no key was configured; anything else means the
+    Anthropic API errored (e.g. exhausted credit / rate limit / outage). Either
+    way we still return the most relevant grounded knowledge with citations.
+    """
     context, citations = retrieve_with_citations(message)
-    answer = (
-        "LLM generation is disabled (no ANTHROPIC_API_KEY set), so here is the "
-        "most relevant knowledge retrieved for your question:\n\n" + context
+    if reason == "no_key":
+        preamble = (
+            "LLM generation is disabled (no ANTHROPIC_API_KEY set), so here is the "
+            "most relevant knowledge retrieved for your question:"
+        )
+    else:
+        preamble = (
+            "The language model is temporarily unavailable, so here is the most "
+            "relevant knowledge retrieved for your question:"
+        )
+    return AgentResponse(
+        answer=preamble + "\n\n" + context,
+        citations=citations,
+        tools_used=["search_botanical_knowledge"],
     )
-    return AgentResponse(answer=answer, citations=citations, tools_used=["search_botanical_knowledge"])
 
 
 def run_agent(req: AgentRequest) -> AgentResponse:
@@ -49,6 +64,18 @@ def run_agent(req: AgentRequest) -> AgentResponse:
         log.warning("No ANTHROPIC_API_KEY; using retrieval-only fallback.")
         return _offline_answer(req.message)
 
+    import anthropic
+
+    try:
+        return _run_agent_llm(req)
+    except anthropic.APIError as exc:
+        # Credit exhausted, rate limited, auth failure, or upstream outage: keep
+        # the service useful by degrading to retrieval-only instead of 500-ing.
+        log.warning(f"Anthropic API unavailable ({exc}); using retrieval-only fallback.")
+        return _offline_answer(req.message, reason="llm_error")
+
+
+def _run_agent_llm(req: AgentRequest) -> AgentResponse:
     import anthropic
 
     client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
